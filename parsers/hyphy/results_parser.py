@@ -1,33 +1,41 @@
+import os
 import sys
-in_fn = "SVB009_combi_1_aln.fasta.output"
+in_fn = "SVB008_combi_1_aln.fas.output"
 
 hsm = []
 s = []
 hbk = []
 hsnn = []
 
-n = 5
+n = 1001
 
-for file_number in range(1, n):
+for file_number in range(0, n):
     print(file_number)
 
     in_fn = "_".join(in_fn.split("_")[:2]) + "_{}_".format(file_number) + "_".join(in_fn.split("_")[3:])
+    print(in_fn)
+    # sys.exit()
 
-    data = []
-    with open(in_fn, "r") as fh:
-        for line in fh:
-            data.append(line.strip())
+    if os.path.isfile(in_fn):
+        print("yeah, it exists")
 
-    for i, line in enumerate(data):
-        f_st_i = 0
-        if "F_ST" in line:
-            break
+        data = []
+        with open(in_fn, "r") as fh:
+            for line in fh:
+                data.append(line.strip())
+        if data[0] == "Error:":
+            continue
 
-    results = [float(x.split(":")[-1]) for x in data[i+2:i+6]]
-    hsm.append(results[0])
-    s.append(results[1])
-    hbk.append(results[2])
-    hsnn.append(results[3])
+        for i, line in enumerate(data):
+            f_st_i = 0
+            if "F_ST" in line:
+                break
+
+        results = [float(x.split(":")[-1]) for x in data[i+2:i+6]]
+        hsm.append(results[0])
+        s.append(results[1])
+        hbk.append(results[2])
+        hsnn.append(results[3])
 
 with open("hudson_slatkin_maddison.csv", "w") as fw:
     fw.write("Hudson Slatkin and Maddison\n")
@@ -55,21 +63,33 @@ s = []
 hbk = []
 hsnn = []
 
-for file_number in range(1, n):
+for file_number in range(0, n):
 
     in_fn = "_".join(in_fn.split("_")[:2]) + "_{}_".format(file_number) + "_".join(in_fn.split("_")[3:])
+    print(in_fn)
 
-    data = []
-    with open(in_fn, "r") as fh:
-        for line in fh:
-            data.append(line.strip())
+    if os.path.isfile(in_fn):
+        print("yeah, it exists")
 
-    results = [float(x.split(":")[-1]) for x in data[-4:]]
+        data = []
+        with open(in_fn, "r") as fh:
+            for line in fh:
+                data.append(line.strip())
+        if data[0] == "Error:":
+            continue
 
-    hsm.append(results[0])
-    s.append(results[1])
-    hbk.append(results[2])
-    hsnn.append(results[3])
+        for i, line in enumerate(data):
+            f_st_i = 0
+            if "F_ST" in line:
+                break
+
+        print(data[-5:-1])
+        results = [float(x.split(":")[-1]) for x in data[-5:-1]]
+
+        hsm.append(results[0])
+        s.append(results[1])
+        hbk.append(results[2])
+        hsnn.append(results[3])
 
 
 with open("2_hudson_slatkin_maddison.csv", "w") as fw:
