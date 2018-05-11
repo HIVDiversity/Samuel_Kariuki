@@ -1,6 +1,7 @@
 import os
 import sys
 in_fn = "SVB008_combi_1_aln.fas.output"
+in_fn = "SVB041_combi_1_aln.fasta.output"
 
 hsm = []
 s = []
@@ -83,8 +84,11 @@ for file_number in range(0, n):
             if "F_ST" in line:
                 break
 
-        print(data[-5:-1])
-        results = [float(x.split(":")[-1]) for x in data[-5:-1]]
+        print(data)
+        while '' in data:
+            data.remove('')
+        print(data[-4:])
+        results = [float(x.split(":")[-1]) for x in data[-4:]]
 
         hsm.append(results[0])
         s.append(results[1])
