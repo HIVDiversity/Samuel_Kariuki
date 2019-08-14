@@ -38,37 +38,43 @@ java -Xms25600m -Xmx51200m -jar -XX:+UseSerialGC -Djava.library.path="$BEAST_LIB
 
 	tmp_output_file.write(tmp_output_string)
 	tmp_output_file.close()
-	
-
-
-if len(sys.argv) < 5:                               
-    sys.stderr.write('\nIncorrect number of arguments. Usage: script_name.py <filename.xml> <Job_name: Max 10 characters> <number_of_reps> <Processor: CPU>\n\n')
-    sys.exit(1)
 
 
 
-xml_filename = sys.argv[1]												
+
+
+
+
+
+if len(sys.argv) < 5:
+	sys.stderr.write('\nIncorrect number of arguments. '
+						'Usage: script_name.py <filename.xml> '
+						'<Job_name: Max 10 characters> <number_of_reps> <Processor: CPU>\n\n')
+	sys.exit(1)
+
+xml_filename = sys.argv[1]
 
 jobname = sys.argv[2]
 if len(jobname) >= 10:
 	jobname = jobname[:10]
 
-num_reps = sys.argv[3]													
+num_reps = sys.argv[3]
 if num_reps.startswith('-'):
 	num_reps = num_reps[1:]
 
-proc_flag = sys.argv[4]													
+proc_flag = sys.argv[4]
 if proc_flag.startswith('-'):
 	proc_flag = proc_flag[1:].lower()
 else:
 	proc_flag = proc_flag[:].lower()
-												
+
 
 cur_dir = getcwd()			# Option so that script can be used by anyone.
-email = raw_input('\nEnter email address for job notifications: ')
-print ('\n')
+email = input('\nEnter email address for job notifications: ')
+print('\n')
 
-## Creates replicate runs directories and executes shell scripts to run BEASTv1.8.1 in queue. ##
+
+# Creates replicate runs directories and executes shell scripts to run BEASTv1.8.1 in queue.
 for rep in range(1, int(num_reps) + 1):
 	rep_name = 'rep' + str(rep)
 	make_directory(rep_name)
@@ -77,6 +83,4 @@ for rep in range(1, int(num_reps) + 1):
 	remove('tmp_submit_script.sh')
 
 
-print '\nScript done...\n'
-
-
+print('\nScript done...\n')
