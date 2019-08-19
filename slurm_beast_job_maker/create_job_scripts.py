@@ -28,7 +28,7 @@ java -jar -Djava.library.path=/opt/exp_soft/beagle-lib/lib/ /opt/exp_soft/BEASTv
 
         file_writer.write(tmp_output_string)
 
-    subprocess.call('tmp_submit_script.sh')
+    subprocess.call(slurm_script_filename)
 
 
 def main(inXML, email, job_name, proc, wd, numRepeats, account):
