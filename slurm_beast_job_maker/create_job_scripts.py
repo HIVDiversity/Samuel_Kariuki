@@ -6,7 +6,9 @@ import subprocess
 
 # Function to create temporary shell script to qsub onto dell cluster.
 def write_script_and_call(repeatNumber, jobname, account, working_dir, email, xml_filename):
-    slurm_script_filename = 'slurm_script_repeat_{repeatNumber}.sh'.format(repeatNumber=repeatNumber)
+    slurm_script_filename = os.path.join(working_dir,
+                                         'slurm_script_repeat_{repeatNumber}.sh'.format(repeatNumber=repeatNumber)
+                                         )
     with open(slurm_script_filename, 'w') as file_writer:
         tmp_output_string = '''#!/bin/sh
 #SBATCH --job-name="{jobname}_R{repeatNumber}"
