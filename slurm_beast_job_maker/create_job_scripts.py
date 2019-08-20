@@ -22,7 +22,7 @@ def call_all_in_parallel(jobname, account, working_dir, email, list_of_files_to_
 '''.format(jobname=jobname, account=account, working_dir=working_dir, email=email)
 
         for bashscript_fn in list_of_files_to_call:
-            tmp_output_string += "{bashscript_fn} &".format(bashscript_fn=bashscript_fn)
+            tmp_output_string += "{bashscript_fn} & \n".format(bashscript_fn=bashscript_fn)
 
         try:
             file_writer.write(tmp_output_string)
@@ -48,6 +48,7 @@ java -jar -Djava.library.path=/opt/exp_soft/beagle-lib/lib/ /opt/exp_soft/BEASTv
     try:
         with open(filename_to_write_to, "w") as fw:
             fw.write(file_content)
+        subprocess.call("chmod +x {}".format(filename_to_write_to), shell=True)
         return True
     except Exception as e:
         print(e)
@@ -62,11 +63,11 @@ def main(inXML, email, job_name, proc, wd, numRepeats, account):
         repeat_working_dir = os.path.join(wd, repeatName)
         if not os.path.exists(repeat_working_dir):
             os.mkdir(repeat_working_dir)
-        sh_fn = os.path.join(repeat_working_dir + ".sh")
+        sh_fn = os.path.join(repeat_working_dir, repeatName +".sh")
         write_sh(sh_fn, inXML)
         script_filenames.append(sh_fn)
 
-    call_all_in_parallel(job_name, account, repeat_working_dir, email, script_filenames)
+    call_all_in_parallel(job_name, account, wd, email, script_filenames)
 
 
 if __name__ == "__main__":
