@@ -66,7 +66,7 @@ def main(inXML, email, job_name, proc, wd, numRepeats, account):
         write_sh(sh_fn, inXML)
         script_filenames.append(sh_fn)
 
-    call_all_in_parallel(repeatNumber, job_name, account, repeat_working_dir, email, inXML, script_filenames)
+    call_all_in_parallel(job_name, account, repeat_working_dir, email, script_filenames)
 
 
 if __name__ == "__main__":
