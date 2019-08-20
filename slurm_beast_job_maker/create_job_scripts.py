@@ -3,10 +3,13 @@ import os
 import sys
 import subprocess
 
+#                       job_name, account, wd,          email, repeat_dirs,         inXML
 
 # Function to call multiple bash scripts in parallel on SLURM under a single slurm resource aquisition.
-def call_all_in_parallel(jobname, account, working_dir, email, list_of_files_to_call):
+def call_all_in_parallel(jobname, account, working_dir, email, list_of_dirs_for_cd, inXML):
     slurm_script_filename = os.path.join(working_dir, 'slurm_script.sh')
+    std_out_fn = os.path.join(working_dir, "std.out")
+    std_err_fn = os.path.join(working_dir, "std.err")
     with open(slurm_script_filename, 'w') as file_writer:
         tmp_output_string = '''#!/bin/sh
 #SBATCH --job-name="{jobname}"
@@ -14,15 +17,24 @@ def call_all_in_parallel(jobname, account, working_dir, email, list_of_files_to_
 #SBATCH --account {account}
 #SBATCH --partition=ada
 #SBATCH --time=10:00:00
-#SBATCH -o {working_dir}/std.out
-#SBATCH -e {working_dir}/std.err
+#SBATCH -o {std_out_fn}
+#SBATCH -e {std_err_fn}
 #SBATCH --mail-user={email}
 #SBATCH --mail-type=ALL
 
-'''.format(jobname=jobname, account=account, working_dir=working_dir, email=email)
 
-        for bashscript_fn in list_of_files_to_call:
-            tmp_output_string += "{bashscript_fn} & \n".format(bashscript_fn=bashscript_fn)
+module load software/beast-1.10.4
+
+'''.format(jobname=jobname, account=account, working_dir=working_dir,
+           email=email, std_out_fn=std_out_fn, std_err_fn=std_err_fn)
+
+        for cd_dir in list_of_dirs_for_cd:
+            tmp_output_string += """"
+
+cd {cd_dir}
+java -jar -Djava.library.path=/opt/exp_soft/beagle-lib/lib/ /opt/exp_soft/BEASTv1.10.4/lib/beast.jar {inXML} &
+
+            """.format(cd_dir=cd_dir, inXML=inXML)
 
         try:
             file_writer.write(tmp_output_string)
@@ -34,22 +46,7 @@ def call_all_in_parallel(jobname, account, working_dir, email, list_of_files_to_
     std_err = open(std_err_fn, "w")
     std_out = open(std_out_fn, "w")
     try:
-        subprocess.call("bash " + slurm_script_filename, shell=True, stderr=std_err, stdout=std_out)
-    except Exception as e:
-        print(e)
-        return False
-
-
-def write_sh(filename_to_write_to, xml_filename):
-    file_content = """
-module load software/beast-1.10.4
-java -jar -Djava.library.path=/opt/exp_soft/beagle-lib/lib/ /opt/exp_soft/BEASTv1.10.4/lib/beast.jar {xml_filename}    
-    """.format(xml_filename=xml_filename)
-    try:
-        with open(filename_to_write_to, "w") as fw:
-            fw.write(file_content)
-        subprocess.call("chmod +x {}".format(filename_to_write_to), shell=True)
-        return True
+        subprocess.call("sbatch " + slurm_script_filename, shell=True, stderr=std_err, stdout=std_out)
     except Exception as e:
         print(e)
         return False
@@ -57,17 +54,15 @@ java -jar -Djava.library.path=/opt/exp_soft/beagle-lib/lib/ /opt/exp_soft/BEASTv
 
 def main(inXML, email, job_name, proc, wd, numRepeats, account):
 
-    script_filenames = []
+    repeat_dirs = []
     for repeatNumber in range(1, numRepeats + 1):
-        repeatName = 'repeat_' + str(repeatNumber)
-        repeat_working_dir = os.path.join(wd, repeatName)
+        repeatName = 'repeat_' + str(repeatNumber)  # repeat_1, repeat_2...etc
+        repeat_working_dir = os.path.join(wd, repeatName)  # /home/dmatten/Sam_beast/job_directory/repeat_1/
         if not os.path.exists(repeat_working_dir):
             os.mkdir(repeat_working_dir)
-        sh_fn = os.path.join(repeat_working_dir, repeatName +".sh")
-        write_sh(sh_fn, inXML)
-        script_filenames.append(sh_fn)
+        repeat_dirs.append(repeat_working_dir)
 
-    call_all_in_parallel(job_name, account, wd, email, script_filenames)
+    call_all_in_parallel(job_name, account, wd, email, repeat_dirs, inXML)
 
 
 if __name__ == "__main__":
