@@ -29,7 +29,7 @@ module load software/beast-1.10.4
            email=email, std_out_fn=std_out_fn, std_err_fn=std_err_fn)
 
         for cd_dir in list_of_dirs_for_cd:
-            tmp_output_string += """"
+            tmp_output_string += """
 
 cd {cd_dir}
 java -jar -Djava.library.path=/opt/exp_soft/beagle-lib/lib/ /opt/exp_soft/BEASTv1.10.4/lib/beast.jar {inXML} &
