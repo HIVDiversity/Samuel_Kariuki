@@ -36,27 +36,21 @@ java -Xms25600m -Xmx51200m -jar -XX:+UseSerialGC -Djava.library.path="$BEAST_LIB
 /opt/exp_soft/BEASTv1.8.2/bin/beast -overwrite -beagle -beagle_sse -beagle_scaling always  %s/%s
 ''' % (jobname, rep, cur_dir, rep, cur_dir, rep, email, cur_dir, rep, cur_dir, xml_filename)
 
-	tmp_output_file.write(tmp_output_string)
-	tmp_output_file.close()
-
-
-
-
-
-
+    tmp_output_file.write(tmp_output_string)
+    tmp_output_file.close()
 
 
 if len(sys.argv) < 5:
-	sys.stderr.write('\nIncorrect number of arguments. '
+    sys.stderr.write('\nIncorrect number of arguments. '
 						'Usage: script_name.py <filename.xml> '
 						'<Job_name: Max 10 characters> <number_of_reps> <Processor: CPU>\n\n')
-	sys.exit(1)
+    sys.exit(1)
 
 xml_filename = sys.argv[1]
 
 jobname = sys.argv[2]
 if len(jobname) >= 10:
-	jobname = jobname[:10]
+    jobname = jobname[:10]
 
 num_reps = sys.argv[3]
 if num_reps.startswith('-'):
