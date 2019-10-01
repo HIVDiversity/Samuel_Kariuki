@@ -5,8 +5,9 @@ from glob import glob
 import json
 
 
-def format_output(p_val_dct, migrations_count, filename):
-    return "{},{},{},{}".format(p_val_dct["panmictic"], p_val_dct["structured"], migrations_count, filename)
+def format_output(p_val_dct, migrations_count, from_blood, from_semen, filename):
+    return "{},{},{},{},{},{}".format(p_val_dct["panmictic"], p_val_dct["structured"], migrations_count,
+                                      from_blood, from_semen, filename)
 
 
 def main(indir, outFile):
@@ -17,6 +18,8 @@ def main(indir, outFile):
 
     output_lines = []
     for fn in glob(indir + os.path.sep + "*"):
+        from_blood = 0
+        from_semen = 0
         #print(fn)
         filename = os.path.split(fn)[1]
         with open(fn, "r") as fh:
@@ -24,9 +27,15 @@ def main(indir, outFile):
             #print(dct.keys())
             #print(dct["p-value"])
             #print(dct["migrations"])
-            output_lines.append(format_output(dct["p-value"], dct["migrations"], filename))
+            #print(dct["events"])
+            for node_id, node_dct in dct["events"].items():
+                if node_dct["from"] == "BLOOD":
+                    from_blood += 1
+                else:
+                    from_semen += 1
+            output_lines.append(format_output(dct["p-value"], dct["migrations"], from_blood, from_semen, filename))
     with open(outFile, "w") as fw:
-        fw.write("panmictic,structured,migration_count,filename\n")
+        fw.write("panmictic,structured,migration_count,Blood_to_semen,Semen_to_blood,filename\n")
         for outline in output_lines:
             fw.write(outline+"\n")
     print("Completed.")
